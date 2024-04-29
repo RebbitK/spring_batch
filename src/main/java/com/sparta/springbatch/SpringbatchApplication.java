@@ -32,6 +32,7 @@ public class SpringbatchApplication {
 	public static void main(String[] args)
  throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException
 		{
+			System.out.println("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
 			SpringApplication app = new SpringApplication(SpringbatchApplication.class);
 			app.setWebApplicationType(
 				WebApplicationType.NONE);
