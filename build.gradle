@@ -15,9 +15,64 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('springCloudVersion', "Greenwich.SR1")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    //database
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+
+    //Querydsl 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'org.json:json:20210307'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+    //jdbc
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+
+    // Spring Batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+
+    // Spring Cloud Function 을 위한 의존성
+    implementation 'org.springframework.cloud:spring-cloud-function-adapter-aws'
+
+    // AWS Lambda 에 배포하기 위한 의존성
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1'
+    // AWS Lambda 이벤트를 다루기 위한 의존성
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '3.9.0'
+    implementation 'org.springframework.cloud:spring-cloud-function-web:3.1.3'
+    implementation 'org.springframework.cloud:spring-cloud-function-adapter-aws:3.1.3'
+
 }
 
 tasks.named('test') {
