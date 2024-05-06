@@ -1,9 +1,12 @@
 package com.sparta.springbatch;
 
+import com.sparta.springbatch.global.config.SpringBatchConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -20,32 +23,14 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@Slf4j
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
-	DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
-@EnableAsync
-@EnableScheduling
-@EnableCaching
-@EnableTransactionManagement(proxyTargetClass = true)
+
+@SpringBootApplication
+@EnableBatchProcessing
 public class SpringbatchApplication {
 
-	public static void main(String[] args)
- throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException
-		{
-			System.out.println("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
-			SpringApplication app = new SpringApplication(SpringbatchApplication.class);
-			app.setWebApplicationType(
-				WebApplicationType.NONE);
-			ConfigurableApplicationContext ctx = app.run(args);
-			JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
-			if (args.length > 0) {
-				Job job = ctx.getBean(args[0], Job.class);
-				jobLauncher.run(job, new JobParameters());
-			} else {
-				log.error("배치 잡 이름을 입력해 주세요. EX) {}", "java -jar app.jar updateTop100CoinPriceJob");
-			}
-			System.exit(0);
-
-		}
-
+	public static void main(String[] args) throws Exception {
+		ConfigurableApplicationContext context = SpringApplication.run(SpringbatchApplication.class, args);
+		SpringBatchConfig batchConfig = context.getBean(SpringBatchConfig.class);
+		batchConfig.runBatchJob();
 	}
+}

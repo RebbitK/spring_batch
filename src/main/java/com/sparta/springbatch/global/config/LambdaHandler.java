@@ -1,38 +1,34 @@
 package com.sparta.springbatch.global.config;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
+@Component
+public class LambdaHandler implements RequestHandler<Object, String> {
 
-@RequiredArgsConstructor
-public class LambdaHandler implements RequestStreamHandler {
-
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final JobLauncher jobLauncher;
+	private final Job myJob;
 	private final SpringBatchConfig springBatchConfig;
 
-	@Override
-	public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
-		// Spring Batch 실행
-		try {
-			springBatchConfig.runBatchJob();
-			sendResponse(outputStream, 200, "Batch job executed successfully.");
-		} catch (Exception e) {
-			sendResponse(outputStream, 500, "Failed to execute batch job: " + e.getMessage());
-		}
+	@Autowired
+	public LambdaHandler(JobLauncher jobLauncher, Job myJob, SpringBatchConfig springBatchConfig) {
+		this.jobLauncher = jobLauncher;
+		this.myJob = myJob;
+		this.springBatchConfig = springBatchConfig;
 	}
 
-	private void sendResponse(OutputStream outputStream, int statusCode, String message) throws IOException {
-		Map<String, Object> response = new HashMap<>();
-		response.put("statusCode", statusCode);
-		response.put("body", message);
-
-		objectMapper.writeValue(outputStream, response);
+	@Override
+	public String handleRequest(Object input, Context context) {
+		try {
+			springBatchConfig.runBatchJob();
+			return "Batch job executed successfully!";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Error executing batch job: " + e.getMessage();
+		}
 	}
 }
