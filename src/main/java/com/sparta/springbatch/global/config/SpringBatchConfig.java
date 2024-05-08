@@ -1,5 +1,6 @@
 package com.sparta.springbatch.global.config;
 
+import com.sparta.springbatch.domain.inventory.repository.InventoryRepository;
 import com.sparta.springbatch.domain.product.entity.Product;
 import com.sparta.springbatch.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class SpringBatchConfig {
 	private final JobLauncher jobLauncher;
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager platformTransactionManager;
-	private final ProductRepository productRepository;
+	private final InventoryRepository inventoryRepository;
 
 
 	@Bean
@@ -47,9 +48,7 @@ public class SpringBatchConfig {
 	@Bean
 	public Tasklet testTasklet() {
 		return ((contribution, chunkContext) -> {
-			Product product = productRepository.findById(1L).get();
-			product.update();
-			productRepository.save(product);
+			inventoryRepository.updateInventory();
 			return RepeatStatus.FINISHED;
 		});
 	}
